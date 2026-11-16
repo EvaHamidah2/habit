@@ -1,0 +1,238 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Habit Harian</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;800&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#eaf4fd; --bg2:#d8eafb; --card:#ffffffcc; --ink:#27425e; --muted:#6f8aa6;
+  --blue:#9ccaf2; --blue-d:#5b9fd6; --blue-l:#cfe6fa; --line:#c9def2; --ok:#7fc4a8;
+  color-scheme:light;
+  box-sizing:border-box; padding-top:env(safe-area-inset-top,0px); padding-bottom:env(safe-area-inset-bottom,0px);
+}
+@media (prefers-color-scheme:dark){
+  :root:not([data-theme="light"]){--bg:#14222f;--bg2:#1a2e40;--card:#1f3448cc;--ink:#e3f0fc;--muted:#97b3cc;--blue:#4f86b5;--blue-d:#8cc4f0;--blue-l:#2b4a66;--line:#2f4c68;--ok:#6cbf9e;color-scheme:dark}
+}
+:root[data-theme="dark"]{--bg:#14222f;--bg2:#1a2e40;--card:#1f3448cc;--ink:#e3f0fc;--muted:#97b3cc;--blue:#4f86b5;--blue-d:#8cc4f0;--blue-l:#2b4a66;--line:#2f4c68;--ok:#6cbf9e;color-scheme:dark}
+html{height:100%;scroll-padding-top:env(safe-area-inset-top,0px)}
+*{box-sizing:border-box}
+body{margin:0;min-height:100%;font-family:'Nunito',system-ui,-apple-system,'Segoe UI',sans-serif;color:var(--ink);
+  background:linear-gradient(160deg,var(--bg),var(--bg2));background-color:var(--bg);overflow-x:hidden;position:relative}
+.blob{position:fixed;border-radius:50%;filter:blur(40px);opacity:.55;background:var(--blue);z-index:0;pointer-events:none;animation:float 14s ease-in-out infinite}
+.b1{width:260px;height:260px;top:-60px;left:-70px}
+.b2{width:220px;height:220px;bottom:-50px;right:-60px;animation-delay:-6s;opacity:.4}
+@keyframes float{0%,100%{transform:translate(0,0)}50%{transform:translate(26px,34px)}}
+main{position:relative;z-index:1;max-width:680px;margin:0 auto;padding:28px 18px 60px}
+header{display:flex;justify-content:space-between;align-items:flex-start;gap:12px;margin-bottom:22px}
+h1{margin:0;font-size:1.9rem;font-weight:800;letter-spacing:-.02em}
+.date{color:var(--muted);font-weight:600;margin-top:2px}
+.theme{border:0;background:var(--card);color:var(--ink);width:42px;height:42px;border-radius:50%;font-size:1.1rem;cursor:pointer;transition:transform .3s}
+.theme:hover{transform:rotate(25deg) scale(1.08)}
+.panel{background:var(--card);backdrop-filter:blur(8px);border:1px solid var(--line);border-radius:26px;padding:20px;box-shadow:0 10px 30px -12px rgba(91,159,214,.35)}
+.hero{display:flex;align-items:center;gap:22px;margin-bottom:18px;animation:rise .8s cubic-bezier(.2,.8,.2,1) both}
+@keyframes rise{from{opacity:0;transform:translateY(18px)}to{opacity:1;transform:none}}
+.ring{position:relative;width:128px;height:128px;flex:none}
+.ring svg{width:100%;height:100%;transform:rotate(-90deg)}
+.ring circle{fill:none;stroke-width:11;stroke-linecap:round}
+.ring .tr{stroke:var(--blue-l)}
+.ring .pg{stroke:var(--blue-d);stroke-dasharray:326.7;stroke-dashoffset:326.7;transition:stroke-dashoffset 1s cubic-bezier(.3,.9,.3,1),stroke .4s}
+.ring.full .pg{stroke:var(--ok)}
+.ring b{position:absolute;inset:0;display:grid;place-items:center;font-size:1.7rem;font-weight:800}
+.hero p{margin:0}
+.hero .big{font-size:1.25rem;font-weight:800;margin-bottom:4px}
+.hero .sub{color:var(--muted);font-weight:600}
+.add{display:flex;gap:8px;margin-bottom:18px}
+.add select,.add input{font:inherit;color:var(--ink);background:var(--card);border:1.5px solid var(--line);border-radius:16px;padding:12px 14px;outline:none;transition:border-color .2s,box-shadow .2s}
+.add input{flex:1;min-width:0}
+.add select{width:62px;font-size:1.1rem;padding:12px 6px}
+.add input:focus,.add select:focus{border-color:var(--blue-d);box-shadow:0 0 0 4px var(--blue-l)}
+.btn{font:inherit;font-weight:800;border:0;border-radius:16px;padding:12px 18px;background:var(--blue-d);color:#fff;cursor:pointer;transition:transform .15s,filter .2s}
+.btn:hover{filter:brightness(1.07)}.btn:active{transform:scale(.94)}
+:root[data-theme="dark"] .btn{color:#10202e}
+.btn:focus-visible,.theme:focus-visible,.chk:focus-visible,.del:focus-visible{outline:3px solid var(--blue-d);outline-offset:2px}
+ul{list-style:none;margin:0;padding:0;display:grid;gap:12px}
+.item{display:grid;grid-template-columns:auto 1fr auto;gap:14px;align-items:center;padding:14px 16px;animation:pop .5s cubic-bezier(.3,1.4,.5,1) both}
+@keyframes pop{from{opacity:0;transform:scale(.9) translateY(10px)}to{opacity:1;transform:none}}
+.item.out{animation:out .3s ease forwards}
+@keyframes out{to{opacity:0;transform:translateX(30px) scale(.95)}}
+.chk{width:46px;height:46px;border-radius:50%;border:2.5px solid var(--blue);background:transparent;cursor:pointer;display:grid;place-items:center;font-size:1.3rem;transition:background .25s,border-color .25s,transform .2s;position:relative}
+.chk:hover{transform:scale(1.08)}
+.chk .tick{opacity:0;transform:scale(0) rotate(-40deg);transition:transform .4s cubic-bezier(.3,1.8,.5,1),opacity .2s;color:#fff;font-weight:800}
+.chk.on{background:var(--blue-d);border-color:var(--blue-d)}
+.chk.on .tick{opacity:1;transform:none}
+.chk.burst::after{content:"";position:absolute;inset:-4px;border-radius:50%;border:3px solid var(--blue-d);animation:ripple .6s ease-out forwards}
+@keyframes ripple{from{opacity:.8;transform:scale(1)}to{opacity:0;transform:scale(1.9)}}
+.name{font-weight:800;font-size:1.05rem;transition:color .3s}
+.item.done .name{color:var(--muted);text-decoration:line-through;text-decoration-color:var(--blue)}
+.meta{display:flex;gap:4px;margin-top:7px;align-items:center;flex-wrap:wrap}
+.d{width:22px;height:22px;border-radius:8px;background:var(--blue-l);font-size:.62rem;font-weight:800;color:var(--muted);display:grid;place-items:center;transition:background .3s}
+.d.on{background:var(--blue-d);color:#fff}
+.d.today{outline:2px solid var(--blue-d);outline-offset:1px}
+.streak{margin-left:8px;font-size:.85rem;font-weight:800;color:var(--blue-d)}
+.del{border:0;background:transparent;color:var(--muted);font-size:1.1rem;cursor:pointer;border-radius:10px;padding:8px;opacity:.6;transition:opacity .2s,color .2s}
+.del:hover{opacity:1;color:#d77a8a}
+.empty{text-align:center;color:var(--muted);font-weight:600;padding:26px 10px}
+.toast{position:fixed;left:50%;bottom:calc(24px + env(safe-area-inset-bottom,0px));transform:translate(-50%,30px);background:var(--ink);color:var(--bg);padding:11px 20px;border-radius:999px;font-weight:700;opacity:0;pointer-events:none;transition:.4s cubic-bezier(.3,1.4,.5,1);z-index:5;max-width:90vw}
+.toast.show{opacity:1;transform:translate(-50%,0)}
+@media (max-width:480px){.hero{flex-direction:column;text-align:center}.item{padding:12px}}
+@media (prefers-reduced-motion:reduce){*,*::before,*::after{animation-duration:.01ms!important;animation-iteration-count:1!important;transition-duration:.01ms!important}}
+</style>
+</head>
+<body>
+<div class="blob b1"></div><div class="blob b2"></div>
+<main>
+  <header>
+    <div>
+      <h1 id="hi">Halo!</h1>
+      <div class="date" id="date"></div>
+    </div>
+    <button class="theme" id="theme" aria-label="Ganti tema">🌙</button>
+  </header>
+
+  <section class="panel hero" aria-live="polite">
+    <div class="ring" id="ring">
+      <svg viewBox="0 0 120 120" aria-hidden="true"><circle class="tr" cx="60" cy="60" r="52"/><circle class="pg" id="pg" cx="60" cy="60" r="52"/></svg>
+      <b id="pct">0%</b>
+    </div>
+    <div>
+      <p class="big" id="big">Mulai hari ini</p>
+      <p class="sub" id="sub"></p>
+    </div>
+  </section>
+
+  <div class="add">
+    <select id="emoji" aria-label="Pilih ikon">
+      <option>💧</option><option>🏃</option><option>📖</option><option>😴</option><option>🥗</option><option>🧘</option><option>✍️</option><option>🎧</option><option>🌱</option><option>⭐</option>
+    </select>
+    <input id="newName" type="text" maxlength="40" placeholder="Tambah kebiasaan baru" aria-label="Nama kebiasaan">
+    <button class="btn" id="addBtn">Tambah</button>
+  </div>
+
+  <ul id="list"></ul>
+</main>
+<div class="toast" id="toast" role="status"></div>
+
+<script>
+(function(){
+  var KEY='habit-tracker-v1', habits=[], root=document.documentElement;
+  function load(){
+    try{var r=localStorage.getItem(KEY);if(r){var p=JSON.parse(r);if(Array.isArray(p))return p}}catch(e){}
+    return null;
+  }
+  function save(){try{localStorage.setItem(KEY,JSON.stringify(habits))}catch(e){}}
+  function uid(){return Date.now().toString(36)+Math.random().toString(36).slice(2,6)}
+  function dk(d){return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0')}
+  function ago(n){var d=new Date();d.setDate(d.getDate()-n);return d}
+  var today=dk(new Date());
+  habits=load()||[
+    {id:uid(),name:'Minum 8 gelas air',emoji:'💧',done:{}},
+    {id:uid(),name:'Olahraga 20 menit',emoji:'🏃',done:{}},
+    {id:uid(),name:'Baca buku 15 menit',emoji:'📖',done:{}}
+  ];
+
+  var el=function(id){return document.getElementById(id)};
+  var hari=['Min','Sen','Sel','Rab','Kam','Jum','Sab'];
+
+  function streak(h){
+    var n=0,i=h.done[today]?0:1;
+    while(h.done[dk(ago(i))]){n++;i++}
+    return n;
+  }
+  var toastT;
+  function toast(t){var x=el('toast');x.textContent=t;x.classList.add('show');clearTimeout(toastT);toastT=setTimeout(function(){x.classList.remove('show')},2200)}
+
+  function header(){
+    var h=new Date().getHours();
+    el('hi').textContent=(h<11?'Selamat pagi':h<15?'Selamat siang':h<18?'Selamat sore':'Selamat malam')+' ☁️';
+    el('date').textContent=new Date().toLocaleDateString('id-ID',{weekday:'long',day:'numeric',month:'long',year:'numeric'});
+  }
+
+  function ring(){
+    var total=habits.length,done=habits.filter(function(h){return h.done[today]}).length;
+    var p=total?done/total:0;
+    el('pg').style.strokeDashoffset=326.7*(1-p);
+    el('pct').textContent=Math.round(p*100)+'%';
+    el('ring').classList.toggle('full',total>0&&done===total);
+    el('big').textContent=!total?'Belum ada kebiasaan':done===total?'Semua beres, kerja bagus!':done===0?'Mulai dari yang kecil':'Terus lanjut, sedikit lagi';
+    el('sub').textContent=total?done+' dari '+total+' kebiasaan selesai hari ini':'Tambahkan kebiasaan pertamamu di bawah.';
+  }
+
+  function render(animate){
+    var ul=el('list');ul.innerHTML='';
+    if(!habits.length){var e=document.createElement('li');e.className='empty';e.textContent='Daftar masih kosong. Tulis kebiasaan lalu tekan Tambah.';ul.appendChild(e)}
+    habits.forEach(function(h,idx){
+      var li=document.createElement('li');
+      li.className='panel item'+(h.done[today]?' done':'');
+      li.style.animationDelay=animate?(idx*70)+'ms':'0ms';
+      li.dataset.id=h.id;
+
+      var b=document.createElement('button');
+      b.className='chk'+(h.done[today]?' on':'');
+      b.setAttribute('aria-label','Tandai '+h.name);
+      b.setAttribute('aria-pressed',h.done[today]?'true':'false');
+      b.innerHTML='<span class="tick">✓</span>';
+      b.addEventListener('click',function(){toggle(h.id,b)});
+
+      var mid=document.createElement('div');
+      var nm=document.createElement('div');nm.className='name';nm.textContent=h.emoji+'  '+h.name;
+      var meta=document.createElement('div');meta.className='meta';
+      for(var i=6;i>=0;i--){
+        var d=ago(i),s=document.createElement('span');
+        s.className='d'+(h.done[dk(d)]?' on':'')+(i===0?' today':'');
+        s.textContent=hari[d.getDay()].charAt(0);
+        s.title=hari[d.getDay()];
+        meta.appendChild(s);
+      }
+      var st=streak(h);
+      if(st>0){var sk=document.createElement('span');sk.className='streak';sk.textContent='🔥 '+st+' hari';meta.appendChild(sk)}
+      mid.appendChild(nm);mid.appendChild(meta);
+
+      var x=document.createElement('button');
+      x.className='del';x.textContent='✕';x.setAttribute('aria-label','Hapus '+h.name);
+      x.addEventListener('click',function(){remove(h.id,li)});
+
+      li.appendChild(b);li.appendChild(mid);li.appendChild(x);
+      ul.appendChild(li);
+    });
+    ring();
+  }
+
+  function toggle(id,btn){
+    var h=habits.filter(function(x){return x.id===id})[0];if(!h)return;
+    if(h.done[today]){delete h.done[today]}else{h.done[today]=true;btn.classList.add('burst')}
+    save();render(false);
+    if(h.done[today]){
+      var all=habits.every(function(x){return x.done[today]});
+      toast(all?'🎉 Semua kebiasaan hari ini selesai!':'Tercatat: '+h.name);
+    }
+  }
+  function remove(id,li){
+    li.classList.add('out');
+    setTimeout(function(){habits=habits.filter(function(x){return x.id!==id});save();render(false);toast('Kebiasaan dihapus')},280);
+  }
+  function add(){
+    var inp=el('newName'),v=inp.value.trim();
+    if(!v){toast('Tulis nama kebiasaan dulu');inp.focus();return}
+    habits.push({id:uid(),name:v,emoji:el('emoji').value,done:{}});
+    inp.value='';save();render(false);toast('Kebiasaan ditambahkan');
+  }
+  el('addBtn').addEventListener('click',add);
+  el('newName').addEventListener('keydown',function(e){if(e.key==='Enter')add()});
+
+  el('theme').addEventListener('click',function(){
+    var dark=root.getAttribute('data-theme')==='dark'||(!root.getAttribute('data-theme')&&matchMedia('(prefers-color-scheme: dark)').matches);
+    root.setAttribute('data-theme',dark?'light':'dark');
+    el('theme').textContent=dark?'🌙':'☀️';
+    try{localStorage.setItem('habit-theme',dark?'light':'dark')}catch(e){}
+  });
+  try{var t=localStorage.getItem('habit-theme');if(t){root.setAttribute('data-theme',t);el('theme').textContent=t==='dark'?'☀️':'🌙'}}catch(e){}
+
+  header();render(true);
+})();
+</script>
+</body>
+</html>
